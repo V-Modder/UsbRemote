@@ -1,12 +1,6 @@
 #include <Arduino.h>
+#include <HID-Project.h>
 #include <IRremote.hpp>
-
-#if FLASHEND <= 0x1FFF  // For 8k flash or less, like ATtiny85. Exclude exotic protocols.
-#define EXCLUDE_EXOTIC_PROTOCOLS
-#  if !defined(DIGISTUMPCORE) // ATTinyCore is bigger than Digispark core
-#define EXCLUDE_UNIVERSAL_PROTOCOLS // Saves up to 1000 bytes program space.
-#  endif
-#endif
 
 #define IR_RECEIVE_PIN 2
 IRrecv receiver(IR_RECEIVE_PIN);
@@ -23,6 +17,42 @@ void setup() {
 
   receiver.enableIRIn();
   enableLEDFeedback(); 
+
+  NKROKeyboard.begin();
+  Consumer.begin();
+}
+
+void convert_ir_code_to_keyboard_key(int code) {
+  KEY_ENTER;
+  KEY_ESC;
+  KEY_HOME;
+  KEY_LEFT;
+  KEY_RIGHT;
+  KEY_UP;
+  KEY_DOWN;
+  KEY_LEFT_WINDOWS;
+  KEY_MENU;
+  KEY_MENU2;
+  KEY_MUTE;
+  KEY_PAUSE;
+  KEY_POWER;
+  KEY_RETURN;
+  KEY_RIGHT_GUI;
+  KEY_STOP;
+  KEY_VOLUME_DOWN;
+  KEY_VOLUME_UP;
+  NKROKeyboard.press(KEY_ENTER);
+  
+  MEDIA_PLAY_PAUSE;
+  MEDIA_NEXT;
+  MEDIA_PREVIOUS;
+  MEDIA_STOP;
+  MEDIA_VOLUME_DOWN;
+  MEDIA_VOLUME_UP;
+  MEDIA_VOLUME_MUTE;
+  CONSUMER_POWER;
+  
+  Consumer.press(MEDIA_PLAY_PAUSE);
 }
 
 void loop() {
