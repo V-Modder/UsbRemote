@@ -3,9 +3,9 @@
 #include <IRremote.hpp>
 
 #define IR_RECEIVE_PIN 2
-IRrecv receiver(IR_RECEIVE_PIN);
-decode_results results;
-unsigned long key_value = 0;
+#define LED_BUILTIN 17
+uint16_t LAST_KEY;
+
 
 void setup() {
   Serial.begin(115200);
@@ -15,14 +15,20 @@ void setup() {
   delay(1000);
   digitalWrite(LED_BUILTIN, HIGH);
 
-  receiver.enableIRIn();
-  enableLEDFeedback(); 
+  IrReceiver.begin(IR_RECEIVE_PIN, true, LED_BUILTIN);
 
   NKROKeyboard.begin();
   Consumer.begin();
 }
 
-void convert_ir_code_to_keyboard_key(int code) {
+void convertItCodeToKeyboardKey(int code) {
+  if(code == 0x151) {
+    NKROKeyboard.press(KEY_ENTER);  
+  }
+  else if(code == 0x161) {
+    Consumer.press(MEDIA_PLAY_PAUSE);
+  }
+
   KEY_ENTER;
   KEY_ESC;
   KEY_HOME;
@@ -41,7 +47,6 @@ void convert_ir_code_to_keyboard_key(int code) {
   KEY_STOP;
   KEY_VOLUME_DOWN;
   KEY_VOLUME_UP;
-  NKROKeyboard.press(KEY_ENTER);
   
   MEDIA_PLAY_PAUSE;
   MEDIA_NEXT;
@@ -51,17 +56,16 @@ void convert_ir_code_to_keyboard_key(int code) {
   MEDIA_VOLUME_UP;
   MEDIA_VOLUME_MUTE;
   CONSUMER_POWER;
-  
-  Consumer.press(MEDIA_PLAY_PAUSE);
 }
 
 void loop() {
-  if (receiver.decode(&results)) {
-    if (results.value == 0XFFFFFFFF) {
-      results.value = key_value;
+  if (IrReceiver.decode()) {
+    if (IrReceiver.decodedIRData.flags & IRDATA_FLAGS_IS_REPEAT == IRDATA_FLAGS_IS_REPEAT) {
+      IrReceiver.decodedIRData.command = LAST_KEY;
     }
-    Serial.println(results.value, HEX);
-    switch (results.decode_type) {
+
+    Serial.println(IrReceiver.decodedIRData.command, HEX);
+    switch (IrReceiver.decodedIRData.protocol) {
       case NEC:
         Serial.println("NEC");
         break;
@@ -110,10 +114,11 @@ void loop() {
       default:
       case UNKNOWN:
         Serial.println("UNKNOWN");
-        break ;
+        break;
     }
     
-    key_value = results.value;
-    receiver.resume();
+    convertItCodeToKeyboardKey(IrReceiver.decodedIRData.command);
+    LAST_KEY = IrReceiver.decodedIRData.command;
+    IrReceiver.resume();
   }
 }
