@@ -4,7 +4,25 @@
 
 #define IR_RECEIVE_PIN 2
 #define LED_BUILTIN 17
-uint16_t LAST_KEY;
+
+#define IR_LEFT 0x511
+#define IR_RIGHT 0x511
+#define IR_UP 0x511
+#define IR_DOWN 0x511
+#define IR_OK 0x511
+#define IR_MENU 0x511
+#define IR_BACK 0x511
+#define IR_HOME 0x511
+#define IR_PLAY_PASUE 0x511
+#define IR_STOP 0x511
+#define IR_NEXT 0x511
+#define IR_PREVIOUS 0x511
+#define IR_VOLUME_UP 0x511
+#define IR_VOLUME_DOWN 0x511
+#define IR_VOLUME_MUTE 0x511
+#define IR_SHUTDOWN 0x511
+
+unsigned int LAST_KEY;
 
 
 void setup() {
@@ -21,41 +39,57 @@ void setup() {
   Consumer.begin();
 }
 
-void convertItCodeToKeyboardKey(int code) {
-  if(code == 0x151) {
+void convertItCodeToKeyboardKey(unsigned int code) {
+  if(code == IR_LEFT) {
+    NKROKeyboard.write(KEY_LEFT);  
+  }
+  else if(code == IR_RIGHT) {
+    NKROKeyboard.write(KEY_RIGHT);  
+  }
+  else if(code == IR_UP) {
+    NKROKeyboard.write(KEY_UP);  
+  }
+  else if(code == IR_DOWN) {
+    NKROKeyboard.write(KEY_DOWN);  
+  }
+  else if(code == IR_OK) {
+    NKROKeyboard.write(KEY_ENTER);  
+  }
+  else if(code == IR_MENU) {
     NKROKeyboard.press(KEY_ENTER);  
+    delay(2000);
+    NKROKeyboard.release(KEY_ENTER);  
   }
-  else if(code == 0x161) {
-    Consumer.press(MEDIA_PLAY_PAUSE);
+  else if(code == IR_BACK) {
+    NKROKeyboard.write(KEY_ESC);  
   }
-
-  KEY_ENTER;
-  KEY_ESC;
-  KEY_HOME;
-  KEY_LEFT;
-  KEY_RIGHT;
-  KEY_UP;
-  KEY_DOWN;
-  KEY_LEFT_WINDOWS;
-  KEY_MENU;
-  KEY_MENU2;
-  KEY_MUTE;
-  KEY_PAUSE;
-  KEY_POWER;
-  KEY_RETURN;
-  KEY_RIGHT_GUI;
-  KEY_STOP;
-  KEY_VOLUME_DOWN;
-  KEY_VOLUME_UP;
-  
-  MEDIA_PLAY_PAUSE;
-  MEDIA_NEXT;
-  MEDIA_PREVIOUS;
-  MEDIA_STOP;
-  MEDIA_VOLUME_DOWN;
-  MEDIA_VOLUME_UP;
-  MEDIA_VOLUME_MUTE;
-  CONSUMER_POWER;
+  else if(code == IR_HOME) {
+    NKROKeyboard.write(KEY_HOME);  
+  }
+  else if(code == IR_PLAY_PASUE) {
+    Consumer.write(MEDIA_PLAY_PAUSE);
+  }
+  else if(code == IR_STOP) {
+    Consumer.write(MEDIA_STOP);
+  }
+  else if(code == IR_NEXT) {
+    Consumer.write(MEDIA_NEXT);
+  }
+  else if(code == IR_PREVIOUS) {
+    Consumer.write(MEDIA_PREVIOUS);
+  }
+  else if(code == IR_VOLUME_UP) {
+    Consumer.write(MEDIA_VOLUME_DOWN);
+  }
+  else if(code == IR_VOLUME_DOWN) {
+    Consumer.write(MEDIA_VOLUME_UP);
+  }
+  else if(code == IR_VOLUME_MUTE) {
+    Consumer.write(MEDIA_VOLUME_MUTE);
+  }
+  else if(code == IR_SHUTDOWN) {
+    Consumer.write(CONSUMER_POWER);
+  }
 }
 
 void loop() {
